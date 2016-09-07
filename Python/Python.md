@@ -23,7 +23,8 @@ Out[8]: 2
 ```
 在Python2中要将整型包裹成为列表，否则会出现`UnboundLocalError: local variable referenced before assignment`，在Python3中可以使用`nonlocal`关键字。
 
-![LEGB](https://pic3.zhimg.com/7f8c20dcd6ae5a99a4d01b6c3a525142_r.jpg)
+![LEGB](https://pic3.zhimg.com/7f8c20dcd6ae5a99a4d01b6c3a525142_r.jpg)      
+
 Python遇到变量会按照LEGB的顺序寻找，并且在哪里创建变量就在哪个作用域绑定。用整型的话就会创建一个整型对象，然后绑定到局部变量上，不会向外部作用域寻找，就会出现先引用后定义导致的`UnboundLocalError`错误。使用列表，不是创建了一个变量，而是引用了外部的列表并修改列表内的引用。
 
 **闭包还有几个注意点**：
