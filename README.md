@@ -829,7 +829,7 @@ int pthread_mutex_destory(pthread_mutex_t *mutex);
 
 * 使用非默认属性的互斥量。
 
-当不需要动态分配的互斥量时需要使用`pthread_mutex_destory()`销毁，静态分配的不需要。
+当不需要动态分配的互斥量时需要使用`pthread_mutex_destory()`销毁，只有当互斥量处于未锁定状态，且后续无任何线程企图锁定它时，销毁才是安全的。若互斥量在堆中，要在free之前销毁。静态分配的不需要销毁。  
 
 互斥量的类型：
 
@@ -846,7 +846,7 @@ int pthread_mutex_destory(pthread_mutex_t *mutex);
 int pthread_mutex_lock(pthread_mutex_t *mutex);
 int pthread_mutex_unlock(pthread_mutex_t *mutex);
 ```
-一个互斥量只能被一个线程加锁，其余的线程调用`pthread_mutex_lock()`将阻塞，直到被释放。已加锁互斥量的线程再次加锁该线程会造成死锁。释放未锁定的互斥量或释放由其他线程锁定的互斥量将出错。
+一个互斥量只能被一个线程加锁，其余的线程调用`pthread_mutex_lock()`将阻塞，直到被释放。已加锁互斥量的线程再次加锁该线程会造成死锁。释放未锁定的互斥量或释放由其他线程锁定的互斥量将出错。当线程退出时不会自动释放锁，如果线程被取消(cancel)时没释放锁也会导致死锁。可以设置清理函数来释放资源。  
 
 互斥量死锁：
 
