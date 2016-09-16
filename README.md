@@ -136,6 +136,12 @@ C语言其实只有一维数组，多维数组也是一维数组，只是数组�
 函数的参数为传值调用，也只有传值调用，没有所谓的传址调用，是将参数的值复制到函数内部的变量上。想要修改实参的值，需要使用指针，函数能够修改实参的值是因为指针的值是实参的地址，修改地址中的数据也就修改了实参的值。
 
 调用函数其实是切换到函数命令的起始地址。当时用函数时，总是将**函数名退化为函数指针**，用来指定函数在内存中的命令。对于函数名func，(&func)()、\(*func)()和func()是一样的。对于函数指针func_ptr，func_ptr()和\(*func_ptr)()是一样的。
+  
+*内联函数(inline)*
+
+C99中增加了内联函数的标准，不过很多编译器在这之前已经支持内联函数这一特性了，编译器和标准的实现会有些差异。在函数定义中使用`inline`关键字就会建议编译器在调用该函数时将该函数展开，省掉函数调用的开销(压栈、跳转、返回等)。  
+> The point of making a function inline is to hint to the compiler that it is worth making some form of extra effort to call the function faster than it would otherwise - generally by substituting the code of the function into its caller. As well as eliminating the need for a call and return sequence, it might allow the compiler to perform certain optimizations between the bodies of both functions.  
+> Sometimes it is necessary for the compiler to emit a stand-alone copy of the object code for a function even though it is an inline function - for instance if it is necessary to take the address of the function, or if it can't be inlined in some particular context, or (perhaps) if optimization has been turned off. (And of course, if you use a compiler that doesn't understand inline, you'll need a stand-alone copy of the object code so that all the calls actually work at all.)  
 
 *函数参数的数组和指针*
 
