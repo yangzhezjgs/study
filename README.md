@@ -264,14 +264,14 @@ size_t offsetof(type, member);
 or #define M() { a(); b(); }
 */
 
-if (cond)
+if (cond) 
     M();
 //  do { a(); b(); } while (0);
 
-/*  a(); b();
+/*  a(); b(); 
     { a(); b() }; 都导致else缺少对应if
 */
-else
+else 
     c();
 ```  
 
