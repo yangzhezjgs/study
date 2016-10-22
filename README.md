@@ -191,7 +191,7 @@ ptr = malloc(sizeof(struct test) + n * sizeof(int));
 
 ### *匿名结构体和匿名联合*  
 
-GNC C和C11提供了这种机制：在结构体中声明联合体或结构体时不包含tag和变量名就可以直接使用联合或结构中的成员。  
+GNU C和C11提供了这种机制：在结构体中声明联合体或结构体时不包含tag和变量名就可以直接使用联合或结构中的成员。  
 ```C
 struct anonymous_struct {
     struct {
