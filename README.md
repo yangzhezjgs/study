@@ -371,7 +371,7 @@ C语言标准定义了4种命名空间:
 所有执行I/O操作的系统调用都以**文件描述符**，一个非负整数，来指代打开的文件。程序开始运行之前，就打开了前3个文件描述符用来指向标准输入、标准输出和标准错误，其实是程序继承了shell文件描述符的副本。打开新的文件会以当前可用的最小值作为文件描述符的值。
 
 
-![image](https://github.com/zlwgx/study/images/file_descriptor.png)
+![image](https://github.com/zlwgx/study/blob/master/images/file_descriptor.png)
 
 内核为文件维护了3个数据结构：
 
@@ -415,7 +415,7 @@ C语言标准定义了4种命名空间:
 
 当进程的文件描述符共享打开的文件描述时，对偏移量和文件标志的操作会影响到每一个文件描述符。在进程中打开的文件，可以被删除，此时文件仍有效，直到打开该文件的进程结束。
 
-![image](https://github.com/zlwgx/study/images/io_buffer.jpg)  
+![image](https://github.com/zlwgx/study/blob/master/images/io_buffer.jpg)  
 
 对文件进行读写主要通过系统调用`read()/write()`或标准I/O函数库`stdio`：
 
@@ -432,7 +432,7 @@ C语言标准定义了4种命名空间:
     
 ### *编译、链接*
 
-![image](https://github.com/zlwgx/study/images/ld.png)  
+![image](https://github.com/zlwgx/study/blob/master/images/ld.png)  
 
 从C源代码文件到ELF可执行目标文件之间会经历非常复杂的过程，一般会有预处理、编译、汇编和链接这几个过程。使用`gcc`等编译器会方便程序员进行上述步骤。
 
@@ -535,11 +535,11 @@ const char *dlerror(void);
 
 典型的Linux-32位机上的进程内存结构如图：
 
-![image](https://github.com/zlwgx/study/images/process_space.png)  
+![image](https://github.com/zlwgx/study/blob/master/images/process_space.png)  
 
 其中`.data`、`.text`、`.bss`等段和可执行目标文件中对应，不过`.bss`段中的内容在虚拟内存中分配了空间。在最上方是内核映射到进程虚拟空间的，程序无法访问。最主要的段是栈和堆：
 
-![image](https://github.com/zlwgx/study/images/stack.png)  
+![image](https://github.com/zlwgx/study/blob/master/images/stack.png)  
 
 * **栈**：栈是一个动态增长和收缩的段，从内存的高地址处向下增长，地址低的为栈顶。栈由**栈帧**组成(32位)，每调用一个函数，就会在栈上新分配一帧，当函数返回时就将此帧移去。%ebp指向当前帧的起始处(高地址)，不变。%esp指向栈顶(低地址)，动态变化。64位去掉了帧指针，只有栈指针。  
 
@@ -576,7 +576,7 @@ Linux使用**虚拟地址空间**来管理进程的内存结构，虚拟地址�
 
 磁盘和存储器之前传送页的活动叫页面调度。现代系统大都采用**按需页面调度**，只有当不命中发生时才换入页面。
 
-![image](https://github.com/zlwgx/study/images/page.png)  
+![image](https://github.com/zlwgx/study/blob/master/images/page.png)  
 
 虚拟内存管理使进程的虚拟地址空间与主存物理地址空间隔离开来，有许多优点：
 
@@ -867,7 +867,7 @@ void *mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset)
 
 线程是允许应用程序并发执行多个任务的另一种机制，也叫轻量级进程。它是运行在进程上下文中的逻辑流，是操作系统能够进行运算调度的最小单位。编译时需要设置`-pthread`选项。
 
-![image](https://github.com/zlwgx/study/images/thread.png)  
+![image](https://github.com/zlwgx/study/blob/master/images/thread.png)  
 
 同一进程的多个线程共享进程的内存空间，内核为每个线程创建一个**线程栈**，和进程相比有两个优点：
 
@@ -1045,11 +1045,11 @@ void *pthread_getspecific(pthread_key_t key);
 
 线程特有数据的实现方法如下：
 
-![image](https://github.com/zlwgx/study/images/thread_key.png)  
+![image](https://github.com/zlwgx/study/blob/master/images/thread_key.png)  
 
 1. 在进程范围维护一个全局数组，存放线程特有数据的键信息：该键是否被使用，还有该键对应的析构函数指针，在线程结束时，会将与键关联的值作为参数调用析构函数。使用`pthread_key_create()`返回的其实是该全局数组的索引，并设置对应数据。
 
-![image](https://github.com/zlwgx/study/images/thread_data.png)  
+![image](https://github.com/zlwgx/study/blob/master/images/thread_data.png)  
 
 2. 每个线程包含一个指针数组，存有为每个线程分配的线程特有数据块的指针。指针会被初始化为NULL，需要使用`pthread_getspecific()`检查是否为NULL，然后使用`pthread_setspeific()`关联值。
 
@@ -1153,7 +1153,7 @@ func(void *arg)
 
 OSI模型和协议过于复杂，也很少见，最主要的还是TCP/IP参考模型：
 
-![image](https://github.com/zlwgx/study/images/OSI.jpg)  
+![image](https://github.com/zlwgx/study/blob/master/images/OSI.jpg)  
 
 分层的目的是为了降低网络设计的复杂性，每一层都建立在其下一层的基础上。每一层使用不同的协议，并为上一层提供服务。数据从高层向下传输会增加消息头部或尾部，而从低层向上会去掉。每层也实现了不同的功能，以TCP/IP模型为例：
 
@@ -1171,7 +1171,7 @@ OSI模型和协议过于复杂，也很少见，最主要的还是TCP/IP参考�
 
 #### *IP*
 
-![image](https://github.com/zlwgx/study/images/ip.jpg)  
+![image](https://github.com/zlwgx/study/blob/master/images/ip.jpg)  
 
 IP地址有两种：**IPv4**和**IPv6**，现阶段最主要的还是**IPv4**。IP地址最初是分成5类的：ABCDE，每一类有不同的网络ID位数和主机ID位数，通过最高位来标识不同的种类。不过由于主机和网络的增多、分类模式引起的资源浪费、路由器中路由表大小限制和IP地址数量的限制，就产生了**不分类域间路由(CIDR)**和**子网划分**：网络和主机ID的位数不再固定，而是通过掩码来确定，极大的提高了灵活性。**IP地址有2个特殊的主机ID不能用，全为0和全为1的：全为1的是广播地址，发送给广播地址的IP数据报交付给网络中的所有主机；全为0的仅用来作为源地址启动来找到主机号，比如在用** *INADDR_ANY* **作为地址bind时。**不过要真正解决IP地址不够用的问题，还是需要迁移到*IPv6*。
 
@@ -1201,7 +1201,7 @@ TCP和UDP协议都存在一个叫做端口的东西，但端口却不是IP协议
 
 #### *TCP*
 
-![image](https://github.com/zlwgx/study/images/tcp_fm.png)  
+![image](https://github.com/zlwgx/study/blob/master/images/tcp_fm.png)  
 
 **TCP提供的是面向连接的、可靠的、全双工的字节流通信**。虽然它是可靠的，但它是建立在IP数据报基础之上的，并不能保证传输过程中不会出错，也不能保证数据一定能够传递到目的主机上。为了提供可靠性，TCP提供了几个服务：
 
@@ -1212,7 +1212,7 @@ TCP和UDP协议都存在一个叫做端口的东西，但端口却不是IP协议
 
 #### *建立连接*
 
-![image](https://github.com/zlwgx/study/images/tcp_handcheck.jpg)  
+![image](https://github.com/zlwgx/study/blob/master/images/tcp_handcheck.jpg)  
 
 TCP建立连接需要发送三个段，所以也叫做**三次握手**。在建立连接的过程中，还有两个重要的选项会被交换：
 
@@ -1231,7 +1231,7 @@ TCP建立连接需要发送三个段，所以也叫做**三次握手**。在建�
 #### *释放连接*
 
 
-![image](https://github.com/zlwgx/study/images/tcp_fin.png)  
+![image](https://github.com/zlwgx/study/blob/master/images/tcp_fin.png)  
 
 释放连接需要交换4次，也叫做**四次挥手**。这是因为TCP连接是全双工的，需要每个方向单独进行关闭，当一端结束数据传输时，就发送**FIN**通知另一端。一个TCP连接在收到一个FIN后仍能发送数据，利用**半关闭(shutdown)**可以实现。
 
@@ -1251,7 +1251,7 @@ TCP数据段是有序列号的，接受方接收到一个TCP段，会发送给�
 
 #### *数据传输*
 
-![image](https://github.com/zlwgx/study/images/tcp_control.jpg)  
+![image](https://github.com/zlwgx/study/blob/master/images/tcp_control.jpg)  
 
 影响数据传输的主要有两方面：**网络**和**应用程序缓冲区空间**。
 
@@ -1263,7 +1263,7 @@ TCP数据段是有序列号的，接受方接收到一个TCP段，会发送给�
 
 #### *慢启动和拥塞避免*
 
-![image](https://github.com/zlwgx/study/images/ss_ca.gif)  
+![image](https://github.com/zlwgx/study/blob/master/images/ss_ca.gif)  
 
 当一个连接建立起来时，无法知道合适的拥塞窗口大小。为了从一开始就避免发生拥塞，慢启动算法将拥塞窗口初始化为**一个MSS大小**，之后每收到一个ACK就增加一个MSS大小。实际上，每一批被确认的数据段会使拥塞窗口大小增加一倍，慢启动其实一点也不慢。拥塞窗口一直呈指数级增长，直到发生超时，或者重复确认，或者达到接收方窗口大小。
 
@@ -1273,7 +1273,7 @@ TCP数据段是有序列号的，接受方接收到一个TCP段，会发送给�
 
 #### *滑动窗口*
 
-![image](https://github.com/zlwgx/study/images/sliding_window.jpg)  
+![image](https://github.com/zlwgx/study/blob/master/images/sliding_window.jpg)  
 
 在上面也提到了内核中的缓冲区概念。滑动窗口不是一个新的缓冲区，而是一种算法，用来高效的组织、协调TCP连接两端的缓冲区。
 
@@ -1305,7 +1305,7 @@ TCP提供了一个**Keepalive**机制用于检测连接。当在一定时间间�
 
 #### *网络字节序和主机字节序*
 
-![image](https://github.com/zlwgx/study/images/endian.png)  
+![image](https://github.com/zlwgx/study/blob/master/images/endian.png)  
 
 根据体系结构的不同，计算机会以不同的方式**存储**和**解释**数据：一种是将低位字节存储在起始地址/将低地址的数据解释成低位字节，叫做**小端法(little-endian)**；另一种将高位字节存储在起始地址/将低地址的数据解释成高位字节，叫做**大端法(big-endian)**。应用程序发送数据总是从低地址开始一字节一字节的发送数据，所以数据在内存中的存储方式会影响在网络中传输的顺序，而应用接受数据也按照顺序从低地址开始存储，也就是说数据在发送端和接收端的内存存储方式是相同的，但是解释方式不一定相同。网络协议规定了以**大端字节序**作为**网络字节序**，提供了一系列的字节序转换函数：
 ```c
@@ -1562,7 +1562,7 @@ setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
 
 *connect(2)*
 
-![image](https://github.com/zlwgx/study/images/connect.png)  
+![image](https://github.com/zlwgx/study/blob/master/images/connect.png)  
 
 通过`socket()`调用创建的是**主动套接字**，这时可以调用`connect()`来连接到一个被动套接字(监听套接字)。
 ```c
@@ -1590,7 +1590,7 @@ connect()调用成功，套接字变为`ESTABLISHED`状态，但不代表连接�
 int listen(int fd, int backlog);
 ```
 
-![image](https://github.com/zlwgx/study/images/listen.jpg)  
+![image](https://github.com/zlwgx/study/blob/master/images/listen.jpg)  
 
 内核为监听套接字维护了两个队列：
 
@@ -1773,7 +1773,7 @@ struct iovec {
 
 *sendfile(2)*  
 
-![image](https://github.com/zlwgx/study/images/sendfile.jpg)  
+![image](https://github.com/zlwgx/study/blob/master/images/sendfile.jpg)  
 
 很多程序需要传递整个文件内容，比如Web服务器和文件服务器。
 ```c
