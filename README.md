@@ -141,12 +141,6 @@ C语言要求**声明和使用的方式尽可能的相似**，了解了这一点
 
 调用函数其实是切换到函数命令的起始地址。当时用函数时，总是将**函数名退化为函数指针**，用来指定函数在内存中的命令。对于函数名func，(&func)()、(\*func)()和func()是一样的。对于函数指针func_ptr，func_ptr()和(\*func_ptr)()是一样的。
   
-### *内联函数(inline)*
-
-C99中增加了内联函数的标准，不过很多编译器在这之前已经支持内联函数这一特性了，编译器和标准的实现会有些差异。在函数定义中使用`inline`关键字就会建议编译器在调用该函数时将该函数展开，省掉函数调用的开销(压栈、跳转、返回等)。  
-> The point of making a function inline is to hint to the compiler that it is worth making some form of extra effort to call the function faster than it would otherwise - generally by substituting the code of the function into its caller. As well as eliminating the need for a call and return sequence, it might allow the compiler to perform certain optimizations between the bodies of both functions.  
-> Sometimes it is necessary for the compiler to emit a stand-alone copy of the object code for a function even though it is an inline function - for instance if it is necessary to take the address of the function, or if it can't be inlined in some particular context, or (perhaps) if optimization has been turned off. (And of course, if you use a compiler that doesn't understand inline, you'll need a stand-alone copy of the object code so that all the calls actually work at all.)  
-
 ### *函数参数的数组和指针*
 
 函数参数传递指针有两种方式：`*`和[]，这两种方式是一样的。当传递给函数时，一维数组和指针是一样的，**数组名会退化为指针**。当传递多维数组给函数时，需要指定后面的长度，以便为地址运算计算元素的偏移量。动态分配的只要传递指针即可，因为都作为向量处理。  
@@ -233,7 +227,20 @@ static有两个作用：
 
 ### *extern*
 
-extern多用在头文件中，用于声明变量和函数是在外部定义的的，不会为该变量分配空间。要注意声明要和定义相匹配，指针和数组在这种情况是不同的，因为内存使用方式不同，通常用于在头文件中声明全局变量和函数，然后在.c中定义，如果在头文件中定义可能会发生重定义。
+extern多用在头文件中，用于声明变量和函数是在外部定义的的，不会为该变量分配空间。要注意声明要和定义相匹配，指针和数组在这种情况是不同的，因为内存使用方式不同，通常用于在头文件中声明全局变量和函数，然后在.c中定义，如果在头文件中定义可能会发生重定义。 
+
+
+### *内联函数(inline)*
+
+C99中增加了内联函数的标准，不过很多编译器在这之前已经支持内联函数这一特性了，编译器和标准的实现会有些差异。在函数定义中使用`inline`关键字就会**建议**编译器在调用该函数时将该函数展开，省掉函数调用的开销(压栈、跳转、返回等)。  
+
+> The point of making a function inline is to hint to the compiler that it is worth making some form of extra effort to call the function faster than it would otherwise - generally by substituting the code of the function into its caller. As well as eliminating the need for a call and return sequence, it might allow the compiler to perform certain optimizations between the bodies of both functions.  
+
+> Sometimes it is necessary for the compiler to emit a stand-alone copy of the object code for a function even though it is an inline function - for instance if it is necessary to take the address of the function, or if it can't be inlined in some particular context, or (perhaps) if optimization has been turned off. (And of course, if you use a compiler that doesn't understand inline, you'll need a stand-alone copy of the object code so that all the calls actually work at all.)  
+
+`inline`常与`static`一起使用：`static inline`。函数调用想要内联，函数定义需要在相同的**翻译单元(translation unit，经过预处理之后的`.c`源文件)**内，因为编译是是按翻译单元为单位分离编译的，
+如果只有函数的声明，那么在链接过程中就会像普通函数一样，确定它的地址再进行调用，不会内联展开。而当头文件的接口需要内联时，不能直接在头文件中定义`inline`函数，当多个文件同时包含这个头文件
+时就会出现**重定义**错误，所以需要在头文件中使用`static inline`，每个包含这个头文件的源文件有自身的副本，互不可见。  
 
 ### *const*
 
@@ -312,7 +319,7 @@ typedef用来给数据类型**定义**新的名字，定义的方式和普通变
 
 ### *命名空间*  
 
-如果有一个标识符(identifier)有多个声明在翻译单元(translation unit)中是可见的，会使用命名空间来区分不同的实体。  
+如果有一个标识符(identifier)有多个声明在翻译单元中是可见的，会使用命名空间来区分不同的实体。  
 
 命名空间用于在**相同作用域**中区分**相同的标识符**:  
 
