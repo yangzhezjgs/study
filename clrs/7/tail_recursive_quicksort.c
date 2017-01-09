@@ -1,63 +1,53 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
+#define SWAP(a, b, t)   \
+    do {                \
+        t temp = a;     \
+        a = b;          \
+        b = temp;       \
+    } while (0)         \
 
-#define EXCHANGE(i, j) { int tmp = i; i = j; j = tmp; }
-
-int partition(int *arr, int low, int high)
+int
+partition(int buf[], int low, int high)
 {
-    int pivot = arr[high];
-    int i = low - 1;
-    int j, temp;
+    int i, j, pivot;
 
-    for (j = low; j < high; j++) {
-        if (arr[j] < pivot) {
+    pivot = buf[high];
+    i = low;
+    for (j = low; j < high; j++)
+        if (buf[j] <= pivot) {
+            SWAP(buf[i], buf[j], int);
             i++;
-            EXCHANGE(arr[i], arr[j]);
         }
-    }
-    arr[high] = arr[i + 1];
-    arr[i + 1] = pivot;
-    return i + 1;
+    SWAP(buf[i], buf[high], int);
+
+    return i;
 }
 
-void quicksort(int *arr, int low, int high)
+void
+tail_recursive_quicksort(int buf[], int low, int high)
 {
-    int mid, pivot;
+    int mid;
+
     while (low < high) {
-        pivot = partition(arr, low, high);
-        mid = (low + high) / 2;
-        if (pivot <= mid) {
-            quicksort(arr, low, pivot - 1);
-            low = pivot + 1;
+        mid = partition(buf, low, high);
+        tail_recursive_quicksort(buf, low, mid - 1);
+        low = mid + 1;
+    }
+}
+
+void
+better_tail_recursive_quicksort(int buf[], int low, int high)
+{
+    int mid;
+
+    while (low < high) {
+        mid = partition(buf, low, high);
+        /* 大的用尾递归 */
+        if (mid < (low + high) / 2) {
+            better_tail_recursive_quicksort(buf, low, mid - 1);
+            low = mid + 1;
         } else {
-            quicksort(arr, pivot + 1, high);
-            high = pivot - 1;
+            better_tail_recursive_quicksort(buf, mid + 1, high);
+            high = mid - 1;
         }
     }
 }
-    
-void print_arr(int *arr, int n)
-{
-    int i;
-    for (i = 0; i < n; i++) {
-        printf("%d ", arr[i]);
-    }
-    printf("\n");
-}
-
-int main()
-{
-    int arr[] = {13, 19, 9, 5, 12, 8, 7, 4, 21, 2, 6, 11};
-    print_arr(arr, 12);
-
-    partition(arr, 0, 11);
-    print_arr(arr, 12);
-
-    quicksort(arr, 0, 11);
-    print_arr(arr, 12);
-
-    return 0;
-}
-
-        

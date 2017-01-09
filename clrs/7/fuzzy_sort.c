@@ -1,115 +1,85 @@
 #include <stdlib.h>
-#include <stdbool.h>
+#include <time.h>
 #include <stdio.h>
 
-#define SWAP(a, b) { tmp = a; a = b; b = tmp; }
+#define SWAP(a, b, t)   \
+    do {                \
+        t temp = a;     \
+        a = b;          \
+        b = temp;       \
+    } while (0)
 
-typedef struct {
-    int left;
-    int right;
+#define LESS(a, b) ((a).high < (b).low)
+#define MORE(a, b) ((a).low > (b).high)
+#define EQUAL(a, b) (((a).low <= (b).high && (a).high >= (b).low) ||    \
+                     ((b).low <= (a).high && (b).high >= (a).low))
+
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+
+typedef struct interval {
+    int low;
+    int high;
 } interval;
 
-bool before(interval a, interval b)
+interval
+fuzzy_partition(interval buf[], int low, int high)
 {
-    return a.right < b.left;
-}
+    interval equal, intersection;
+    int i, j, pivot;
 
-bool after(interval a, interval b)
-{
-    return a.left > b.right;
-}
+    srand((unsigned) time(NULL));
+    pivot = low + rand() % (high - low + 1);
+    SWAP(buf[pivot], buf[high], interval);
 
-bool intersect(interval a, interval b)
-{
-    return (a.right >= b.left) && (a.left <= b.right);
-}
-
-interval partition(interval *arr, int low, int high)
-{
-    interval intersection = arr[high], tmp;
-    int i = low - 1;
-    int j;
-    
-    for (j = low; j < high; j++) {
-        if (intersect(intersection, arr[j])) {
-            if (intersection.left < arr[j].left) {
-                intersection.left = arr[j].left;
-            }
-            if (intersection.right > arr[j].right) {
-                intersection.right = arr[j].right;
-            }
-        }
-    }
-
-    for (j = low; j < high; j++) {
-        if (before(arr[j], intersection)) {
+    for (i = j = low; j < high; j++)
+        if (LESS(buf[j], buf[high])) {
+            SWAP(buf[j], buf[i], interval);
             i++;
-            SWAP(arr[j], arr[i]);
         }
-    }
-    int s = i + 1;
-    for (j = s; j <= high; j++) {
-        if (intersect(intersection, arr[j])) {
-            i++;
-            SWAP(arr[j], arr[i]);
-        }
-    }
 
-    return (interval) {s, i};
+    intersection = buf[high];
+    equal.low = i;
+    for (j = i; j <= high; j++)
+        /* 相等没有传递性，需要求交集 */
+        if (EQUAL(intersection, buf[j])) {
+            intersection.low = MAX(buf[j].low, intersection.low);
+            intersection.high = MIN(buf[j].high, intersection.high);
+            SWAP(buf[i], buf[j], interval);
+            i++;
+        }
+    equal.high = i - 1;
+
+    return equal;
 }
 
-void quicksort(interval *arr, int low, int high)
+void
+fuzzy_sort(interval buf[], int low, int high)
 {
+    interval mid;
+
     if (low < high) {
-        interval pivot = partition(arr, low, high);
-        quicksort(arr, low, pivot.left - 1);
-        quicksort(arr, pivot.right + 1, high);
+        mid = fuzzy_partition(buf, low, high);
+        fuzzy_sort(buf, low, mid.low - 1);
+        fuzzy_sort(buf, mid.high + 1, high);
     }
 }
 
-void print_interval(interval *arr, int n)
+int
+main(void)
 {
     int i;
-    for (i = 0; i < n; i++) {
-        printf("[%d, %d] ", arr[i].left, arr[i].right);
-    }
-    printf("\n");
-}
+    interval buf[] = {
+        {1, 2},
+        {3, 4},
+        {5, 6},
+        {6, 7}
+    };
 
-interval *get_rand_interval(int n, int bound)
-{
-    interval *buf;
-    buf = (interval *) calloc(n, sizeof(interval));
-    if (!buf)
-        return NULL;
-    srand((unsigned) time(NULL));
-    int left, right, i;
+    fuzzy_sort(buf, 0, 3);
 
-    for (i = 0; i < n; i++) {
-        left = rand() % bound;
-        right = rand() % bound;
-        if (left < right) {
-            buf[i].left = left;
-            buf[i].right = right;
-        } else {
-            buf[i].left = right;
-            buf[i].right = left;
-        }
-    }
-    return buf;
-}
+    for (i = 0; i < 4; i++)
+        printf("(%d, %d)\n", buf[i].low, buf[i].high);
 
-            
-
-int main(void)
-{
-    interval *arr = get_rand_interval(10, 100);
-    if (arr) {
-        print_interval(arr, 10);
-        quicksort(arr, 0, 9);
-        print_interval(arr, 10);
-    }
     return 0;
 }
-
-

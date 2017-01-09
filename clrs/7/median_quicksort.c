@@ -1,87 +1,49 @@
-#include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
-#define EXCHANGE(i, j) { int tmp = i; i = j; j = tmp; }
+#define SWAP(a, b, t)   \
+    do {                \
+        t temp = a;     \
+        a = b;          \
+        b = temp;       \
+    } while (0)
 
-int partition(int *arr, int low, int high)
+int
+median_partition(int buf[], int low, int high)
 {
-    int pivot = arr[high];
-    int i = low - 1;
-    int j, temp;
+    int i, j, pivot;
 
-    for (j = low; j < high; j++) {
-        if (arr[j] < pivot) {
-            i++;
-            EXCHANGE(arr[i], arr[j]);
-        }
-    }
-    arr[high] = arr[i + 1];
-    arr[i + 1] = pivot;
-    return i + 1;
-}
-
-void quicksort(int *arr, int low, int high)
-{
-    int mid;
-    if (low < high) {
-        mid = partition(arr, low, high);
-        quicksort(arr, low, mid - 1);
-        quicksort(arr, mid + 1, high);
-    }
-}
-
-int randomized_partition(int *arr, int low, int high)
-{
     srand((unsigned) time(NULL));
-    int i = rand() % (high - low + 1) + low;
-    int j = rand() % (high - low + 1) + low;
-    int k = rand() % (high - low + 1) + low;
-    int pivot;
-    if ((arr[i] >= arr[j] && arr[i] <= arr[k]) || (arr[i] <= arr[j] && arr[i] >= arr[k])) {
+    i = low + rand() % (high - low + 1);
+    j = low + rand() % (high - low + 1);
+    pivot = low + rand() % (high - low + 1);
+    
+    if ((buf[i] <= buf[j] && buf[i] >= buf[pivot]) || 
+        (buf[i] >= buf[j] && buf[i] <= buf[pivot]))
         pivot = i;
-    } else if ((arr[j] >= arr[i] && arr[j] <= arr[k]) || (arr[j] >= arr[k] && arr[j] <= arr[i])) {
+    else if ((buf[j] <= buf[i] && buf[j] >= buf[pivot]) ||
+             (buf[j] >= buf[i] && buf[j] <= buf[pivot]))
         pivot = j;
-    } else {
-        pivot = k;
-    }   
 
-    EXCHANGE(arr[pivot], arr[high]);
-    return partition(arr, low, high);
+    SWAP(buf[pivot], buf[high], int);
+    for (i = j = low; j < high; j++)
+        if (buf[j] <= buf[high]) {
+            SWAP(buf[j], buf[i], int);
+            i++;
+        }
+    SWAP(buf[high], buf[i], int);
+
+    return i;
 }
 
-int randomized_quicksort(int *arr, int low, int high)
+void
+median_quicksort(int buf[], int low, int high)
 {
     int mid;
+
     if (low < high) {
-        mid = randomized_partition(arr, low ,high);
-        randomized_quicksort(arr, low, mid - 1);
-        randomized_quicksort(arr, mid + 1, high);
+        mid = median_partition(buf, low, high);
+        median_quicksort(buf, low, mid - 1);
+        median_quicksort(buf, mid + 1, high);
     }
 }
-
-    
-void print_arr(int *arr, int n)
-{
-    int i;
-    for (i = 0; i < n; i++) {
-        printf("%d ", arr[i]);
-    }
-    printf("\n");
-}
-
-int main()
-{
-    int arr[] = {13, 19, 9, 5, 12, 8, 7, 4, 21, 2, 6, 11};
-    print_arr(arr, 12);
-
-    randomized_partition(arr, 0, 11);
-    print_arr(arr, 12);
-
-    randomized_quicksort(arr, 0, 11);
-    print_arr(arr, 12);
-
-    return 0;
-}
-
-        

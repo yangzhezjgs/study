@@ -937,26 +937,29 @@ int pthread_detach(pthread_t thread);
 
 由于线程共享地址空间，线程对同一资源的访问会造成意想不到的结果，所以需要进行同步。
 
-**临界区**指访问某一共享资源的代码片段，并且这段代码的执行是原子的。可以通过互斥量来实现，互斥量有两种分配方式：
+**临界区**指访问某一共享资源的代码片段，并且这段代码的执行是原子的，可以通过互斥量来实现。  
+互斥量有两种分配方式：
 
-1. **静态分配**：`pthread_mutex_t mtx = PTHREAD_MUTEX_INITIALIZER;`。
+1. **静态分配初始化(全局变量或`static`局部变量)**：`pthread_mutex_t mtx = PTHREAD_MUTEX_INITIALIZER;`。
 
-2. **动态分配**：
+2. **动态分配初始化(在栈中或堆中)**：
 ```c
 #include <pthread.h>
 
 int pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr);
 int pthread_mutex_destory(pthread_mutex_t *mutex);
 ```
-在下面几种情况需要动态分配：
+在下面几种情况需要动态初始化：
 
 * 动态分配堆中的互斥量。
 
 * 互斥量是在栈中分配的自动变量。
 
-* 使用非默认属性的互斥量。
+* 使用非默认属性的静态分配互斥量。
 
-当不需要动态分配的互斥量时需要使用`pthread_mutex_destory()`销毁，只有当互斥量处于未锁定状态，且后续无任何线程企图锁定它时，销毁才是安全的。若互斥量在堆中，要在free之前销毁。静态分配的不需要销毁。  
+当不需要动态分配的互斥量时需要使用`pthread_mutex_destory()`销毁，只有当互斥量处于未锁定状态，且后续无任何线程企图锁定它时，销毁才是安全的。
+若互斥量在堆中，要在free之前销毁。静态分配的不需要销毁。这是因为`mutex`是一种数据结构，静态分配的会使它一直有效，而动态分配的可能会导致内存泄露需要手动销毁。  
+
 
 互斥量的类型：
 

@@ -1,17 +1,46 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
-#define EXCHANGE(i, j) temp = i; i = j; j = temp;
-#define PARENT(i) ((i) / 2)
-#define LEFT(i) ((i) * 2)
-#define RIGHT(i) ((i) * 2 + 1)
+#define MAXNUMBER   1000
 
-int main()
+int *
+get_data(int n)
 {
-    int a[] = {1, 2};
-    int *b = a;
+    int *buf, i;
 
-    printf("%d\n", *b++);
+    buf = (int *) malloc(n * sizeof(int));
+    if (buf == NULL)
+        return NULL;
+
+    srand((unsigned) time(NULL));
+    for (i = 0; i < n; i++)
+        buf[i] = rand() % MAXNUMBER;
+
+    return buf;
+}
+
+void
+print_array(int buf[], int n)
+{
+    int i;
+
+    for (i = 0; i < n; i++)
+        printf("%d ", buf[i]);
+
+    printf("\n");
+}
+
+
+int
+main(void)
+{
+    int *buf;
+
+    buf = get_data(100);
+    quicksort(buf, 0, 99);
+    print_array(buf, 100);
 
     return 0;
 }
+

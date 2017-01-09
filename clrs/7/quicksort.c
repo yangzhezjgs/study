@@ -1,76 +1,106 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
+#include <string.h>
 
-#define EXCHANGE(i, j) { int tmp = i; i = j; j = tmp; }
+#define SWAP(a, b, t)   \
+    do {                \
+        t temp = a;     \
+        a = b;          \
+        b = temp;       \
+    } while (0)         \
 
-int partition(int *arr, int low, int high)
+int
+partition(int buf[], int low, int high)
 {
-    int pivot = arr[high];
-    int i = low - 1;
-    int j, temp;
+    int i, j, pivot;
 
-    for (j = low; j < high; j++) {
-        if (arr[j] < pivot) {
+    pivot = buf[high];
+    i = low;
+    for (j = low; j < high; j++)
+        if (buf[j] <= pivot) {
+            SWAP(buf[i], buf[j], int);
             i++;
-            EXCHANGE(arr[i], arr[j]);
+        }
+    SWAP(buf[i], buf[high], int);
+
+    return i;
+}
+
+int
+hoare_partition1(int buf[], int low, int high)
+{
+    int pivot = buf[low];
+
+    while (1) {
+        while (buf[high] > pivot)
+            high--;
+        while (buf[low] < pivot)
+            low++;
+        if (low < high) {
+            SWAP(buf[low], buf[high], int);
+            low++;
+            high--;
+        } else
+            return high;
+    }
+}
+
+int
+hoare_partition2(int buf[], int low, int high)
+{
+    int pivot, i, j;
+
+    pivot = buf[low];
+    i = low - 1;
+    j = high + 1;
+
+    while (1) {
+        do {
+            j--;
+        } while (buf[j] > pivot);
+
+        do {
+            i++;
+        } while (buf[i] < pivot);
+
+        if (i < j)
+            SWAP(buf[i], buf[j], int);
+        else {
+            return j;
         }
     }
-    arr[high] = arr[i + 1];
-    arr[i + 1] = pivot;
-    return i + 1;
 }
 
-void quicksort(int *arr, int low, int high)
+
+int
+hoare_partition3(int buf[], int low, int high)
 {
-    int mid;
-    if (low < high) {
-        mid = partition(arr, low, high);
-        quicksort(arr, low, mid - 1);
-        quicksort(arr, mid + 1, high);
+    int pivot = buf[low];
+    int i = low, j = high;
+    while (i < j) {
+        while (i < j && buf[j] >= pivot)
+            j--;
+        buf[i] = buf[j];
+        while (i < j && buf[i] <= pivot)
+            i++;
+        buf[j] = buf[i];
     }
+    buf[i] = pivot;
+    return i;
+
 }
 
-int randomized_partition(int *arr, int low, int high)
+void
+quicksort(int buf[], int low, int high)
 {
-    srand((unsigned) time(NULL));
-    int pivot = rand() % (high - low + 1) + low;
-    EXCHANGE(arr[pivot], arr[high]);
-    return partition(arr, low, high);
-}
-
-int randomized_quicksort(int *arr, int low, int high)
-{
-    int mid;
-    if (low < high) {
-        mid = randomized_partition(arr, low ,high);
-        randomized_quicksort(arr, low, mid - 1);
-        randomized_quicksort(arr, mid + 1, high);
-    }
-}
-
-    
-void print_arr(int *arr, int n)
-{
+    int mid, temp;
     int i;
-    for (i = 0; i < n; i++) {
-        printf("%d ", arr[i]);
+
+    if (low < high) {
+        mid = hoare_partition3(buf, low, high);
+        quicksort(buf, low, mid - 1);
+        quicksort(buf, mid+1, high);
     }
-    printf("\n");
 }
 
-int main()
-{
-    int arr[] = {13, 19, 9, 5, 12, 8, 7, 4, 21, 2, 6, 11};
-    print_arr(arr, 12);
 
-    randomized_partition(arr, 0, 11);
-    print_arr(arr, 12);
-
-    randomized_quicksort(arr, 0, 11);
-    print_arr(arr, 12);
-
-    return 0;
-}
-
-        
