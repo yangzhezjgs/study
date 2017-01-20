@@ -42,10 +42,10 @@ int main(void)
             event.data.fd = connfd;
             epoll_ctl(epfd, EPOLL_CTL_ADD, connfd, &event);
         } else {
-        if (e.events & EPOLLIN)
-            printf("ready to read\n");
-        if (e.events & EPOLLOUT)
-            printf("ready to write\n");
+            if (e.events & EPOLLIN)
+                printf("ready to read\n");
+            if (e.events & EPOLLOUT)
+                printf("ready to write\n");
         }
     }
 }
